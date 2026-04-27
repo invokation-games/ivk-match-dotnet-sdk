@@ -1,0 +1,5 @@
+syntax = "proto3";
+package matchmaker.engines.nemesis.v1;
+
+// Engine output for nemesis. Reserved for future use; engine is WIP.
+message EngineOutput {}

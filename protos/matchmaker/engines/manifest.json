@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "engines": [
+    { "id": "basic_sbmm", "version": "v1", "package": "matchmaker.engines.basic_sbmm.v1" },
+    { "id": "rule_based", "version": "v1", "package": "matchmaker.engines.rule_based.v1" },
+    { "id": "nemesis",    "version": "v1", "package": "matchmaker.engines.nemesis.v1" }
+  ]
+}

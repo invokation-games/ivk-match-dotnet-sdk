@@ -1,0 +1,12 @@
+syntax = "proto3";
+package matchmaker.engines.basic_sbmm.v1;
+
+// Engine input for basic-sbmm. Encoded into Ticket.engine_input bytes.
+message EngineInput {
+  repeated Player players = 1;
+}
+
+message Player {
+  string player_id = 1;
+  double mmr = 2;
+}

@@ -1,0 +1,56 @@
+syntax = "proto3";
+package matchmaker.engines.rule_based.v1;
+
+// Engine output for rule-based. Encoded into Match.engine_output and Team.engine_output bytes.
+message EngineOutput {
+  string gamemode = 1;
+  string region = 2;
+  bool cross_platform = 3;
+  optional MatchObservability observability = 4;
+}
+
+message MatchObservability {
+  RegionSelection region_selection = 1;
+  SkillMetrics skill_metrics = 2;
+  LatencyMetrics latency_metrics = 3;
+  SearchStatsOutput search_stats = 4;
+  BalanceMetrics balance_metrics = 5;
+}
+
+message RegionSelection {
+  string selected = 1;
+  // Region -> latency_ms aggregated across the match.
+  map<string, uint32> candidates = 2;
+}
+
+message SkillMetrics {
+  double min_mmr = 1;
+  double max_mmr = 2;
+  double mmr_range = 3;
+  double average_mmr = 4;
+  double variance = 5;
+  double team_balance_error = 6;
+  double mad_difference = 7;
+  optional double party_avg_spread = 8;
+  optional double player_mmr_spread = 9;
+}
+
+message LatencyMetrics {
+  uint32 max_latency_ms = 1;
+  double average_latency_ms = 2;
+  // player_id -> latency_ms to selected region.
+  map<string, uint32> player_latencies = 3;
+}
+
+message SearchStatsOutput {
+  uint64 nodes_expanded = 1;
+  uint64 nodes_pruned = 2;
+  uint64 partition_pruned = 3;
+  uint64 search_time_ms = 4;
+}
+
+message BalanceMetrics {
+  double best_gap = 1;
+  double sum_sq_diff = 2;
+  uint64 quality_pruned = 3;
+}

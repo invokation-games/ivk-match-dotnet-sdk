@@ -1,0 +1,222 @@
+syntax = "proto3";
+package matchmaker.core.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+// A Ticket is a basic matchmaking entity in IVK Match. A Ticket may represent
+// an individual 'Player', a 'Group' of players, or any other concepts unique to
+// your use case. IVK Match will not interpret what the Ticket represents but
+// just treat it as a matchmaking unit with a set of SearchFields.
+message Ticket {
+  // Caller-supplied stable ticket ID. Required on create.
+  string id = 1;
+
+  // Selected Queue ID.
+  string queue_id = 2;
+
+  // Defaults to current timestamp.
+  google.protobuf.Timestamp created_at = 3;
+
+  // Engine-schema payload delivered to the MatchEngine (player list, mmr,
+  // latencies, ...). Format is defined by the selected MatchEngine.
+  optional bytes engine_input = 4;
+
+  // Which rulesets this ticket participates in. Empty = all rulesets in the queue.
+  repeated string ruleset_ids = 5;
+
+  // Opaque, caller-owned metadata echoed back on Match results. The matchmaker
+  // never inspects this field. Subject to a configurable per-queue size limit.
+  optional bytes metadata = 6;
+}
+
+// API response/request messages used by the public API surface.
+//--------------------------------------------------------------
+
+// CreateTicket persists a caller-supplied ticket and echoes the same ID on success.
+message CreateTicketRequest {
+  Ticket ticket = 1;
+}
+message CreateTicketResponse {
+  string ticket_id = 1;
+}
+
+message BackfillRequest {
+  // Backfill request ID. If omitted, server generates one.
+  string id = 1;
+
+  // Selected Queue ID.
+  string queue_id = 2;
+
+  // Defaults to current timestamp.
+  google.protobuf.Timestamp created_at = 3;
+
+  // Existing match ID this request backfills.
+  string match_id = 4;
+
+  // Which ruleset this backfill request belongs to.
+  string ruleset_id = 5;
+
+  // Number of open slots requested.
+  uint32 slots_requested = 6;
+
+  // Engine-schema payload delivered to the MatchEngine backfill phase.
+  optional bytes engine_input = 7;
+
+  // Opaque, caller-owned metadata echoed back on BackfillResult. The matchmaker
+  // never inspects this field. Subject to a configurable per-queue size limit.
+  optional bytes metadata = 8;
+}
+
+message CreateBackfillRequestRequest {
+  BackfillRequest backfill_request = 1;
+}
+
+message CreateBackfillRequestResponse {
+  string backfill_id = 1;
+}
+
+message CancelBackfillRequestsRequest {
+  string queue_id = 1;
+  repeated string backfill_ids = 2;
+}
+
+message CancelBackfillRequestsResponse {}
+
+// CancelTicket removes a ticket from matchmaking entirely.
+message CancelTicketRequest {
+  string queue_id = 1;
+  string ticket_id = 2;
+}
+message CancelTicketResponse {}
+
+message Team {
+  // Useful for observability or specific team matching
+  string name = 1;
+
+  // Full tickets assigned to this team (each carries its caller-owned metadata).
+  repeated Ticket tickets = 2;
+
+  // Engine-produced output (team-level info, schema defined by engine).
+  optional bytes engine_output = 3;
+}
+
+message Match {
+  // Match ID added to telemetry.
+  string id = 1;
+
+  // Tickets in this match, organized by team.
+  map<string, Team> teams = 2;
+
+  // Engine-produced output (match-level info, schema defined by engine).
+  optional bytes engine_output = 3;
+
+  // Timestamp when the match was created.
+  google.protobuf.Timestamp created_at = 4;
+
+  // Which ruleset produced this match.
+  string ruleset_id = 5;
+}
+
+message BackfillResult {
+  // Backfill result ID.
+  string id = 1;
+
+  // The original BackfillRequest, echoed back in full (so callers get their
+  // metadata and engine_input without a separate lookup).
+  BackfillRequest request = 2;
+
+  // Full Ticket structs assigned to the backfill (each carries its metadata).
+  repeated Ticket assigned_tickets = 3;
+
+  // Timestamp when this backfill result was created.
+  google.protobuf.Timestamp created_at = 4;
+}
+
+// Debug API: Query cached tickets
+//--------------------------------------------------------------
+
+// Request to query cached tickets for debugging purposes.
+// All filters are optional and combined with AND logic.
+message GetCacheTicketsRequest {
+  // Optional: Filter to a specific queue
+  optional string queue_id = 1;
+
+  reserved 2, 5;
+
+  // Optional: Only return tickets older than this (seconds since created_at)
+  optional int64 min_age_seconds = 3;
+
+  // Optional: Include expired tickets (default: false)
+  optional bool include_expired = 6;
+
+  // Pagination: max results (default: 100, max: 1000)
+  optional int32 limit = 7;
+
+  // Pagination: offset token from previous response
+  optional string page_token = 8;
+}
+
+// Response containing cached tickets matching the query.
+message GetCacheTicketsResponse {
+  // Matching tickets with cache metadata
+  repeated CachedTicketInfo tickets = 1;
+
+  // Total count of matching tickets (before pagination)
+  int64 total_count = 2;
+
+  // Token for next page, empty if no more results
+  string next_page_token = 3;
+}
+
+// Information about a cached ticket, including cache-specific metadata.
+message CachedTicketInfo {
+  // The ticket data
+  Ticket ticket = 1;
+
+  // Which queue this ticket belongs to
+  string queue_id = 2;
+
+  reserved 3;
+
+  // How long the ticket has been waiting (seconds since created_at)
+  int64 age_seconds = 4;
+
+  // Whether the ticket is active (visible in pools)
+  bool is_active = 5;
+
+  // Whether the ticket has expired (should be cleaned up)
+  bool is_expired = 6;
+}
+
+// ReactivateTickets: Move resolved tickets back to active state.
+// Used for MultiQueue reconciliation — when a ticket is resolved in multiple
+// queues, the reconciliation step discards losing matches and reactivates their tickets.
+//--------------------------------------------------------------
+
+message ReactivateTicketsRequest {
+  string queue_id = 1;
+  repeated string ticket_ids = 2;
+}
+
+message ReactivateTicketsResponse {
+  // IDs of tickets that could not be reactivated (not found in cache or not in Resolved state).
+  // Empty when all tickets were successfully reactivated.
+  repeated string failed_ticket_ids = 1;
+}
+
+// ClearQueueCache: Clear all tickets from the cache for a specific queue.
+// Used primarily for E2E testing to ensure a clean state between test runs.
+//--------------------------------------------------------------
+
+// Request to clear all cached tickets for a queue.
+message ClearQueueCacheRequest {
+  // The queue ID to clear tickets from. Required.
+  string queue_id = 1;
+}
+
+// Response after clearing the queue cache.
+message ClearQueueCacheResponse {
+  // Number of tickets that were cleared from the cache.
+  uint64 tickets_cleared = 1;
+}

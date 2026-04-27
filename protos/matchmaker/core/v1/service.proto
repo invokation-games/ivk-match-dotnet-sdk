@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package matchmaker.core.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "matchmaker/core/v1/model.proto";
+
+service MatchmakerService {
+  rpc CreateTicket(CreateTicketRequest) returns (CreateTicketResponse) {}
+  rpc CreateBackfillRequest(CreateBackfillRequestRequest) returns (CreateBackfillRequestResponse) {}
+  rpc CancelTicket(CancelTicketRequest) returns (CancelTicketResponse) {}
+  rpc CancelBackfillRequests(CancelBackfillRequestsRequest) returns (CancelBackfillRequestsResponse) {}
+  rpc ReactivateTickets(ReactivateTicketsRequest) returns (ReactivateTicketsResponse) {}
+
+  // Debug: Query tickets from the in-memory cache.
+  // Useful for debugging long-waiting tickets.
+  rpc GetCacheTickets(GetCacheTicketsRequest) returns (GetCacheTicketsResponse) {}
+
+  // ClearQueueCache clears all tickets from the cache for a specific queue.
+  // This is primarily used for E2E testing to ensure a clean state between test runs.
+  // Returns the count of tickets that were cleared.
+  rpc ClearQueueCache(ClearQueueCacheRequest) returns (ClearQueueCacheResponse) {}
+}

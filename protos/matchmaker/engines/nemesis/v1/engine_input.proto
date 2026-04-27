@@ -1,0 +1,14 @@
+syntax = "proto3";
+package matchmaker.engines.nemesis.v1;
+
+// Engine input for nemesis. Encoded into Ticket.engine_input bytes.
+message EngineInput {
+  repeated Player players = 1;
+}
+
+message Player {
+  string player_id = 1;
+  double mmr = 2;
+  map<string, uint32> latencies = 3;
+  string platform = 4;
+}

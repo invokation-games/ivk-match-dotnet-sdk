@@ -1,0 +1,17 @@
+syntax = "proto3";
+package matchmaker.engines.rule_based.v1;
+
+// Engine input for rule-based. Encoded into Ticket.engine_input bytes.
+message EngineInput {
+  bool cross_platform = 1;
+  repeated string gamemodes = 2;
+  repeated Player players = 3;
+}
+
+message Player {
+  string player_id = 1;
+  double mmr = 2;
+  // Region -> latency_ms, e.g. {"us-east": 30, "eu-west": 90}
+  map<string, uint32> latencies = 3;
+  string platform = 4;
+}

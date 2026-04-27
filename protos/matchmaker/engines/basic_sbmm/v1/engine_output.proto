@@ -1,0 +1,5 @@
+syntax = "proto3";
+package matchmaker.engines.basic_sbmm.v1;
+
+// Engine output for basic-sbmm. Currently empty; reserved for future use.
+message EngineOutput {}
