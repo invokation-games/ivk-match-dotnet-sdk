@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDKs
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+            8.0.x
+            10.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build (all target frameworks)
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test on .NET 6
+        run: dotnet test tests/Invokation.Match.Sdk.Tests.Net6 --configuration Release --no-build --verbosity normal
+
+      - name: Test on .NET 8
+        run: dotnet test tests/Invokation.Match.Sdk.Tests.Net8 --configuration Release --no-build --verbosity normal
+
+      - name: Test on .NET 10
+        run: dotnet test tests/Invokation.Match.Sdk.Tests.Net10 --configuration Release --no-build --verbosity normal
+
+      - name: Run main test suite (.NET 10)
+        run: dotnet test tests/Invokation.Match.Sdk.Tests --configuration Release --no-build --verbosity normal
+
+  buf-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup buf
+        uses: bufbuild/buf-setup-action@v1
+
+      - name: Lint protos
+        run: buf lint
+
+  buf-breaking:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup buf
+        uses: bufbuild/buf-setup-action@v1
+
+      - name: Check for breaking changes
+        run: buf breaking --against ".git#branch=main"
