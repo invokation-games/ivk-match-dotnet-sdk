@@ -33,7 +33,16 @@ jobs:
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
           echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Skip if already at this revision
+        id: check
+        run: |
+          if [ -f protos/.proto-rev ] && [ "$(cat protos/.proto-rev | tr -d '[:space:]')" = "${{ steps.sha.outputs.sha }}" ]; then
+            echo "Already at ${{ steps.sha.outputs.short }} — nothing to do."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Vendor public proto subset
+        if: steps.check.outputs.skip != 'true'
         run: |
           set -euo pipefail
           rm -rf protos/matchmaker
@@ -68,6 +77,7 @@ jobs:
           rm -rf ivk-protos
 
       - name: Open PR
+        if: steps.check.outputs.skip != 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: 'chore: sync protos to ${{ steps.sha.outputs.short }}'

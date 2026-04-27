@@ -1,2 +1,6 @@
+# Placeholder. Grpc.Tools generates C# from `.proto` files at `dotnet build` time;
+# this file exists for ad-hoc `buf generate` invocations and to satisfy buf v2's
+# expected layout. Add plugins here only if you need standalone codegen outside
+# of MSBuild.
 version: v2
 plugins: []
