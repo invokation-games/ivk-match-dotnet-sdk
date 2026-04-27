@@ -1,0 +1,79 @@
+name: Sync Protos
+
+on:
+  workflow_dispatch:
+    inputs:
+      ivk_protos_sha:
+        description: 'ivk-protos commit SHA to sync from (default: main HEAD)'
+        required: false
+        default: ''
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Checkout ivk-protos
+        uses: actions/checkout@v4
+        with:
+          repository: invokation-games/ivk-protos
+          ref: ${{ github.event.inputs.ivk_protos_sha || 'main' }}
+          token: ${{ secrets.IVK_PROTOS_PAT }}
+          path: ivk-protos
+
+      - name: Resolve SHA
+        id: sha
+        run: |
+          cd ivk-protos
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Vendor public proto subset
+        run: |
+          set -euo pipefail
+          rm -rf protos/matchmaker
+          PROTOS_SRC=ivk-protos/proto
+          mkdir -p protos/matchmaker/core/v1
+
+          # Required: matchmaker/core/v1
+          cp $PROTOS_SRC/matchmaker/core/v1/*.proto protos/matchmaker/core/v1/
+
+          # Optional: queue/ruleset (may not exist on all revisions of ivk-protos)
+          if [ -d "$PROTOS_SRC/matchmaker/queue/v1" ]; then
+            mkdir -p protos/matchmaker/queue/v1
+            cp $PROTOS_SRC/matchmaker/queue/v1/*.proto protos/matchmaker/queue/v1/
+          fi
+          if [ -d "$PROTOS_SRC/matchmaker/ruleset/v1" ]; then
+            mkdir -p protos/matchmaker/ruleset/v1
+            cp $PROTOS_SRC/matchmaker/ruleset/v1/*.proto protos/matchmaker/ruleset/v1/
+          fi
+
+          # Engines: only those listed in manifest.json
+          MANIFEST=$PROTOS_SRC/matchmaker/engines/manifest.json
+          mkdir -p protos/matchmaker/engines
+          for engine in $(jq -r '.engines[].id' $MANIFEST); do
+            mkdir -p protos/matchmaker/engines/$engine/v1
+            cp $PROTOS_SRC/matchmaker/engines/$engine/v1/*.proto protos/matchmaker/engines/$engine/v1/
+          done
+          cp $MANIFEST protos/matchmaker/engines/manifest.json
+
+          # Record source revision
+          echo "${{ steps.sha.outputs.sha }}" > protos/.proto-rev
+
+          rm -rf ivk-protos
+
+      - name: Open PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: 'chore: sync protos to ${{ steps.sha.outputs.short }}'
+          title: 'chore: sync protos to ivk-protos@${{ steps.sha.outputs.short }}'
+          body: |
+            Auto-generated proto sync from ivk-protos.
+            Source SHA: ${{ steps.sha.outputs.sha }}
+          branch: chore/sync-protos-${{ steps.sha.outputs.short }}
+          delete-branch: true
