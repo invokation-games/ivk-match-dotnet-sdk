@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Invokation.Match.Sdk.Example/Invokation.Match.Sdk.Example.csproj" />
+    <Project Path="src/Invokation.Match.Sdk/Invokation.Match.Sdk.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Invokation.Match.Sdk.Tests.Net10/Invokation.Match.Sdk.Tests.Net10.csproj" />
+    <Project Path="tests/Invokation.Match.Sdk.Tests.Net6/Invokation.Match.Sdk.Tests.Net6.csproj" />
+    <Project Path="tests/Invokation.Match.Sdk.Tests.Net8/Invokation.Match.Sdk.Tests.Net8.csproj" />
+    <Project Path="tests/Invokation.Match.Sdk.Tests/Invokation.Match.Sdk.Tests.csproj" />
+  </Folder>
+</Solution>
