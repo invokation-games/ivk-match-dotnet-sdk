@@ -1,0 +1,6 @@
+[tools]
+dotnet = "10"
+"dotnet@8" = "8"
+"dotnet@6" = "6"
+just = "latest"
+buf = "latest"
