@@ -1,0 +1,15 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+.vscode/
+nupkg/
+
+# Tooling
+.idea/
+*.swp
+
+# Test artifacts
+TestResults/
+coverage/
