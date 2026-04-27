@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Configuration;
 using Matchmaker.Core.V1;
@@ -8,7 +12,7 @@ namespace Invokation.Match.Sdk;
 /// Async-only client facade over the IVK Match matchmaker gRPC service.
 /// Construct via <see cref="CreateBuilder"/>.
 /// </summary>
-public sealed class MatchSdk : System.IDisposable
+public sealed class MatchSdk : IDisposable, IAsyncDisposable
 {
     private readonly GrpcChannel _channel;
     private readonly bool _ownsChannel;
@@ -23,71 +27,71 @@ public sealed class MatchSdk : System.IDisposable
 
     public static MatchSdkBuilder CreateBuilder() => new();
 
-    public async System.Threading.Tasks.Task<string> CreateTicketAsync(
+    public async Task<string> CreateTicketAsync(
         Ticket ticket,
-        System.Threading.CancellationToken ct = default)
+        CancellationToken ct = default)
     {
         var resp = await _client.CreateTicketAsync(
             new CreateTicketRequest { Ticket = ticket },
-            cancellationToken: ct);
+            cancellationToken: ct).ConfigureAwait(false);
         return resp.TicketId;
     }
 
-    public async System.Threading.Tasks.Task CancelTicketAsync(
+    public async Task CancelTicketAsync(
         string queueId,
         string ticketId,
-        System.Threading.CancellationToken ct = default)
+        CancellationToken ct = default)
     {
         await _client.CancelTicketAsync(
             new CancelTicketRequest { QueueId = queueId, TicketId = ticketId },
-            cancellationToken: ct);
+            cancellationToken: ct).ConfigureAwait(false);
     }
 
-    public async System.Threading.Tasks.Task<string> CreateBackfillRequestAsync(
+    public async Task<string> CreateBackfillRequestAsync(
         BackfillRequest request,
-        System.Threading.CancellationToken ct = default)
+        CancellationToken ct = default)
     {
         var resp = await _client.CreateBackfillRequestAsync(
             new CreateBackfillRequestRequest { BackfillRequest = request },
-            cancellationToken: ct);
+            cancellationToken: ct).ConfigureAwait(false);
         return resp.BackfillId;
     }
 
-    public async System.Threading.Tasks.Task CancelBackfillRequestsAsync(
+    public async Task CancelBackfillRequestsAsync(
         string queueId,
-        System.Collections.Generic.IEnumerable<string> backfillIds,
-        System.Threading.CancellationToken ct = default)
+        IEnumerable<string> backfillIds,
+        CancellationToken ct = default)
     {
         var req = new CancelBackfillRequestsRequest { QueueId = queueId };
         req.BackfillIds.AddRange(backfillIds);
-        await _client.CancelBackfillRequestsAsync(req, cancellationToken: ct);
+        await _client.CancelBackfillRequestsAsync(req, cancellationToken: ct).ConfigureAwait(false);
     }
 
-    public async System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string>> ReactivateTicketsAsync(
+    public async Task<IReadOnlyList<string>> ReactivateTicketsAsync(
         string queueId,
-        System.Collections.Generic.IEnumerable<string> ticketIds,
-        System.Threading.CancellationToken ct = default)
+        IEnumerable<string> ticketIds,
+        CancellationToken ct = default)
     {
         var req = new ReactivateTicketsRequest { QueueId = queueId };
         req.TicketIds.AddRange(ticketIds);
-        var resp = await _client.ReactivateTicketsAsync(req, cancellationToken: ct);
+        var resp = await _client.ReactivateTicketsAsync(req, cancellationToken: ct).ConfigureAwait(false);
         return resp.FailedTicketIds;
     }
 
-    public async System.Threading.Tasks.Task<GetCacheTicketsResponse> GetCacheTicketsAsync(
+    public async Task<GetCacheTicketsResponse> GetCacheTicketsAsync(
         GetCacheTicketsRequest request,
-        System.Threading.CancellationToken ct = default)
+        CancellationToken ct = default)
     {
-        return await _client.GetCacheTicketsAsync(request, cancellationToken: ct);
+        return await _client.GetCacheTicketsAsync(request, cancellationToken: ct).ConfigureAwait(false);
     }
 
-    public async System.Threading.Tasks.Task<ulong> ClearQueueCacheAsync(
+    public async Task<ulong> ClearQueueCacheAsync(
         string queueId,
-        System.Threading.CancellationToken ct = default)
+        CancellationToken ct = default)
     {
         var resp = await _client.ClearQueueCacheAsync(
             new ClearQueueCacheRequest { QueueId = queueId },
-            cancellationToken: ct);
+            cancellationToken: ct).ConfigureAwait(false);
         return resp.TicketsCleared;
     }
 
@@ -100,8 +104,8 @@ public sealed class MatchSdk : System.IDisposable
             RetryPolicy = new RetryPolicy
             {
                 MaxAttempts = retry.MaxAttempts,
-                InitialBackoff = System.TimeSpan.FromMilliseconds(retry.InitialBackoffMs),
-                MaxBackoff = System.TimeSpan.FromMilliseconds(retry.MaxBackoffMs),
+                InitialBackoff = TimeSpan.FromMilliseconds(retry.InitialBackoffMs),
+                MaxBackoff = TimeSpan.FromMilliseconds(retry.MaxBackoffMs),
                 BackoffMultiplier = retry.BackoffMultiplier,
                 RetryableStatusCodes = { Grpc.Core.StatusCode.Unavailable, Grpc.Core.StatusCode.DeadlineExceeded },
             },
@@ -112,5 +116,14 @@ public sealed class MatchSdk : System.IDisposable
     public void Dispose()
     {
         if (_ownsChannel) _channel.Dispose();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_ownsChannel)
+        {
+            await _channel.ShutdownAsync().ConfigureAwait(false);
+            _channel.Dispose();
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -6,6 +7,8 @@ namespace Invokation.Match.Sdk;
 
 /// <summary>
 /// Fluent builder for <see cref="MatchSdk"/>. Obtain via <see cref="MatchSdk.CreateBuilder"/>.
+///
+/// Not thread-safe; configure from a single thread before calling <see cref="Build"/>.
 /// </summary>
 public sealed class MatchSdkBuilder
 {
@@ -18,24 +21,29 @@ public sealed class MatchSdkBuilder
 
     public MatchSdkBuilder WithBaseUrl(string baseUrl)
     {
+        if (string.IsNullOrWhiteSpace(baseUrl))
+            throw new ArgumentException("BaseUrl must be a non-empty URL.", nameof(baseUrl));
         _baseUrl = baseUrl;
         return this;
     }
 
     public MatchSdkBuilder WithRetryConfig(RetryConfig retry)
     {
+        ArgumentNullException.ThrowIfNull(retry);
         _retry = retry;
         return this;
     }
 
     public MatchSdkBuilder WithLogger(ILogger logger)
     {
+        ArgumentNullException.ThrowIfNull(logger);
         _logger = logger;
         return this;
     }
 
     public MatchSdkBuilder WithHttpClient(System.Net.Http.HttpClient client)
     {
+        ArgumentNullException.ThrowIfNull(client);
         _httpClient = client;
         return this;
     }
@@ -43,7 +51,7 @@ public sealed class MatchSdkBuilder
     public MatchSdk Build()
     {
         if (string.IsNullOrWhiteSpace(_baseUrl))
-            throw new System.InvalidOperationException("BaseUrl is required (e.g., http://localhost:50051).");
+            throw new InvalidOperationException("BaseUrl is required (e.g., http://localhost:50051).");
 
         var channelOptions = new GrpcChannelOptions
         {
