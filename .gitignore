@@ -5,10 +5,15 @@ obj/
 .vs/
 .vscode/
 nupkg/
+*.snupkg
 
 # Tooling
 .idea/
 *.swp
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Test artifacts
 TestResults/
