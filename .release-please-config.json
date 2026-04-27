@@ -1,0 +1,18 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "Invokation.Match.Sdk",
+      "changelog-path": "CHANGELOG.md",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "extra-files": [
+        {
+          "type": "xml",
+          "path": "src/Invokation.Match.Sdk/Invokation.Match.Sdk.csproj",
+          "xpath": "//Project/PropertyGroup/Version"
+        }
+      ]
+    }
+  }
+}
