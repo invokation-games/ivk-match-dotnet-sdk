@@ -62,11 +62,13 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup buf
         uses: bufbuild/buf-setup-action@v1
 
+      # Compare against main fetched fresh from the remote. The local-clone
+      # form (`.git#branch=main`) doesn't work because actions/checkout doesn't
+      # populate refs/heads/main in the worker — it checks out the PR's merge
+      # ref directly.
       - name: Check for breaking changes
-        run: buf breaking --against ".git#branch=main"
+        run: buf breaking --against "https://github.com/${{ github.repository }}.git#branch=main"

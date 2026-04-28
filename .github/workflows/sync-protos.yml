@@ -85,5 +85,8 @@ jobs:
           body: |
             Auto-generated proto sync from ivk-protos.
             Source SHA: ${{ steps.sha.outputs.sha }}
-          branch: chore/sync-protos-${{ steps.sha.outputs.short }}
+          # Fixed branch name (not SHA-suffixed) so rapid pushes to ivk-protos
+          # collapse onto a single rolling PR. The action force-pushes new
+          # content and updates the title/body to the latest source SHA.
+          branch: chore/sync-protos
           delete-branch: true
