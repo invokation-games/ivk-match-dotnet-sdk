@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/invokation-games/ivk-match-dotnet-sdk/compare/Invokation.Match.Sdk-v1.0.0...Invokation.Match.Sdk-v1.0.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* remove engine specific tests ([#7](https://github.com/invokation-games/ivk-match-dotnet-sdk/issues/7)) ([6793c8c](https://github.com/invokation-games/ivk-match-dotnet-sdk/commit/6793c8caa560a9600caf4874d09fbbe785017a90))
+
 ## 1.0.0 (2026-04-28)
 
 
