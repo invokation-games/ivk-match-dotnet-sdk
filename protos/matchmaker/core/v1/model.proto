@@ -1,6 +1,5 @@
 syntax = "proto3";
 package matchmaker.core.v1;
-
 import "google/protobuf/timestamp.proto";
 
 // A Ticket is a basic matchmaking entity in IVK Match. A Ticket may represent
@@ -141,19 +140,17 @@ message GetCacheTicketsRequest {
   // Optional: Filter to a specific queue
   optional string queue_id = 1;
 
-  reserved 2, 5;
-
   // Optional: Only return tickets older than this (seconds since created_at)
-  optional int64 min_age_seconds = 3;
+  optional int64 min_age_seconds = 2;
 
   // Optional: Include expired tickets (default: false)
-  optional bool include_expired = 6;
+  optional bool include_expired = 3;
 
   // Pagination: max results (default: 100, max: 1000)
-  optional int32 limit = 7;
+  optional int32 limit = 4;
 
   // Pagination: offset token from previous response
-  optional string page_token = 8;
+  optional string page_token = 5;
 }
 
 // Response containing cached tickets matching the query.
@@ -176,16 +173,14 @@ message CachedTicketInfo {
   // Which queue this ticket belongs to
   string queue_id = 2;
 
-  reserved 3;
-
   // How long the ticket has been waiting (seconds since created_at)
-  int64 age_seconds = 4;
+  int64 age_seconds = 3;
 
   // Whether the ticket is active (visible in pools)
-  bool is_active = 5;
+  bool is_active = 4;
 
   // Whether the ticket has expired (should be cleaned up)
-  bool is_expired = 6;
+  bool is_expired = 5;
 }
 
 // ReactivateTickets: Move resolved tickets back to active state.
