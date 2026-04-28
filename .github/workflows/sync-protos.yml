@@ -80,8 +80,8 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: 'chore: sync protos to ${{ steps.sha.outputs.short }}'
-          title: 'chore: sync protos to ivk-protos@${{ steps.sha.outputs.short }}'
+          commit-message: 'feat: sync protos to ${{ steps.sha.outputs.short }}'
+          title: 'feat: sync protos to ivk-protos@${{ steps.sha.outputs.short }}'
           body: |
             Auto-generated proto sync from ivk-protos.
             Source SHA: ${{ steps.sha.outputs.sha }}
