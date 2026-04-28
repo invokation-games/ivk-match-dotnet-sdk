@@ -3,10 +3,8 @@ package matchmaker.engines.rule_based.v1;
 
 // Engine output for rule-based. Encoded into Match.engine_output and Team.engine_output bytes.
 message EngineOutput {
-  string gamemode = 1;
-  string region = 2;
-  bool cross_platform = 3;
-  optional MatchObservability observability = 4;
+  string region = 1;
+  optional MatchObservability observability = 2;
 }
 
 message MatchObservability {
