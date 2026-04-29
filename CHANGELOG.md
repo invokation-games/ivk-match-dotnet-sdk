@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/invokation-games/ivk-match-dotnet-sdk/compare/Invokation.Match.Sdk-v1.0.1...Invokation.Match.Sdk-v1.1.0) (2026-04-29)
+
+
+### Features
+
+* sync protos to 26c79b8 ([#10](https://github.com/invokation-games/ivk-match-dotnet-sdk/issues/10)) ([ff87f66](https://github.com/invokation-games/ivk-match-dotnet-sdk/commit/ff87f66d9dd67e377eb72a6b01da9de08797f15d))
+
+
+### Bug Fixes
+
+* rename based on protos ([#12](https://github.com/invokation-games/ivk-match-dotnet-sdk/issues/12)) ([2392060](https://github.com/invokation-games/ivk-match-dotnet-sdk/commit/2392060f471284c7856de29326b6b852b7952b48))
+
 ## [1.0.1](https://github.com/invokation-games/ivk-match-dotnet-sdk/compare/Invokation.Match.Sdk-v1.0.0...Invokation.Match.Sdk-v1.0.1) (2026-04-28)
 
 
