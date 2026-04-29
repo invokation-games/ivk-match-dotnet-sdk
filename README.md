@@ -143,16 +143,16 @@ await sdk.CancelBackfillRequestsAsync(
     ct);
 ```
 
-### Cache (debug / E2E)
+### Pool (debug / E2E)
 
 ```csharp
-// GetCacheTickets — query cached tickets with optional filters.
-GetCacheTicketsResponse response = await sdk.GetCacheTicketsAsync(
-    new GetCacheTicketsRequest { QueueId = "ranked_solo", Limit = 100 },
+// ListPoolTickets — query pool tickets with optional filters.
+ListPoolTicketsResponse response = await sdk.ListPoolTicketsAsync(
+    new ListPoolTicketsRequest { QueueId = "ranked_solo", Limit = 100 },
     ct);
 
-// ClearQueueCache — clear all cached tickets for a queue (E2E helper).
-ulong cleared = await sdk.ClearQueueCacheAsync(queueId: "ranked_solo", ct);
+// ClearQueuePool — clear all tickets and backfill requests from the pool for a queue (E2E helper).
+ClearQueuePoolResponse cleared = await sdk.ClearQueuePoolAsync(queueId: "ranked_solo", ct);
 ```
 
 ## Engine Helpers
