@@ -8,7 +8,7 @@ message EngineInput {
 }
 
 message Attribute {
-  repeated string value = 1;
+  repeated string values = 1;
   repeated string accepts = 2;
 }
 

@@ -11,12 +11,12 @@ service MatchmakerService {
   rpc CancelBackfillRequests(CancelBackfillRequestsRequest) returns (CancelBackfillRequestsResponse) {}
   rpc ReactivateTickets(ReactivateTicketsRequest) returns (ReactivateTicketsResponse) {}
 
-  // Debug: Query tickets from the in-memory cache.
+  // Debug: Query tickets from the in-memory pool.
   // Useful for debugging long-waiting tickets.
-  rpc GetCacheTickets(GetCacheTicketsRequest) returns (GetCacheTicketsResponse) {}
+  rpc ListPoolTickets(ListPoolTicketsRequest) returns (ListPoolTicketsResponse) {}
 
-  // ClearQueueCache clears all tickets from the cache for a specific queue.
+  // ClearQueuePool clears all tickets and backfill requests from the pool for a specific queue.
   // This is primarily used for E2E testing to ensure a clean state between test runs.
-  // Returns the count of tickets that were cleared.
-  rpc ClearQueueCache(ClearQueueCacheRequest) returns (ClearQueueCacheResponse) {}
+  // Returns the counts of tickets and backfill requests that were cleared.
+  rpc ClearQueuePool(ClearQueuePoolRequest) returns (ClearQueuePoolResponse) {}
 }

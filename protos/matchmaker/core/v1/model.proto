@@ -131,12 +131,12 @@ message BackfillResult {
   google.protobuf.Timestamp created_at = 4;
 }
 
-// Debug API: Query cached tickets
+// Debug API: Query pool tickets
 //--------------------------------------------------------------
 
-// Request to query cached tickets for debugging purposes.
+// Request to query pool tickets for debugging purposes.
 // All filters are optional and combined with AND logic.
-message GetCacheTicketsRequest {
+message ListPoolTicketsRequest {
   // Optional: Filter to a specific queue
   optional string queue_id = 1;
 
@@ -153,10 +153,10 @@ message GetCacheTicketsRequest {
   optional string page_token = 5;
 }
 
-// Response containing cached tickets matching the query.
-message GetCacheTicketsResponse {
-  // Matching tickets with cache metadata
-  repeated CachedTicketInfo tickets = 1;
+// Response containing pool tickets matching the query.
+message ListPoolTicketsResponse {
+  // Matching tickets with pool metadata
+  repeated PoolTicketInfo tickets = 1;
 
   // Total count of matching tickets (before pagination)
   int64 total_count = 2;
@@ -165,8 +165,8 @@ message GetCacheTicketsResponse {
   string next_page_token = 3;
 }
 
-// Information about a cached ticket, including cache-specific metadata.
-message CachedTicketInfo {
+// Information about a pool ticket, including pool-specific metadata.
+message PoolTicketInfo {
   // The ticket data
   Ticket ticket = 1;
 
@@ -194,23 +194,26 @@ message ReactivateTicketsRequest {
 }
 
 message ReactivateTicketsResponse {
-  // IDs of tickets that could not be reactivated (not found in cache or not in Resolved state).
+  // IDs of tickets that could not be reactivated (not found in the pool or not in Resolved state).
   // Empty when all tickets were successfully reactivated.
   repeated string failed_ticket_ids = 1;
 }
 
-// ClearQueueCache: Clear all tickets from the cache for a specific queue.
+// ClearQueuePool: Clear all tickets and backfill requests from the pool for a specific queue.
 // Used primarily for E2E testing to ensure a clean state between test runs.
 //--------------------------------------------------------------
 
-// Request to clear all cached tickets for a queue.
-message ClearQueueCacheRequest {
+// Request to clear all tickets and backfill requests for a queue.
+message ClearQueuePoolRequest {
   // The queue ID to clear tickets from. Required.
   string queue_id = 1;
 }
 
-// Response after clearing the queue cache.
-message ClearQueueCacheResponse {
-  // Number of tickets that were cleared from the cache.
+// Response after clearing the queue pool.
+message ClearQueuePoolResponse {
+  // Number of tickets that were cleared from the pool.
   uint64 tickets_cleared = 1;
+
+  // Number of backfill requests that were cleared from the pool.
+  uint64 backfill_requests_cleared = 2;
 }
