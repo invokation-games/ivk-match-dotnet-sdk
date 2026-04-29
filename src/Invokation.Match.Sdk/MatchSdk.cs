@@ -78,21 +78,20 @@ public sealed class MatchSdk : IDisposable, IAsyncDisposable
         return resp.FailedTicketIds;
     }
 
-    public async Task<GetCacheTicketsResponse> GetCacheTicketsAsync(
-        GetCacheTicketsRequest request,
+    public async Task<ListPoolTicketsResponse> ListPoolTicketsAsync(
+        ListPoolTicketsRequest request,
         CancellationToken ct = default)
     {
-        return await _client.GetCacheTicketsAsync(request, cancellationToken: ct).ConfigureAwait(false);
+        return await _client.ListPoolTicketsAsync(request, cancellationToken: ct).ConfigureAwait(false);
     }
 
-    public async Task<ulong> ClearQueueCacheAsync(
+    public async Task<ClearQueuePoolResponse> ClearQueuePoolAsync(
         string queueId,
         CancellationToken ct = default)
     {
-        var resp = await _client.ClearQueueCacheAsync(
-            new ClearQueueCacheRequest { QueueId = queueId },
+        return await _client.ClearQueuePoolAsync(
+            new ClearQueuePoolRequest { QueueId = queueId },
             cancellationToken: ct).ConfigureAwait(false);
-        return resp.TicketsCleared;
     }
 
     internal static ServiceConfig BuildServiceConfig(RetryConfig retry)
