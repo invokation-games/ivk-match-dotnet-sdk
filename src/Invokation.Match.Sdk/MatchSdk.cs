@@ -8,11 +8,45 @@ using Matchmaker.Core.V1;
 
 namespace Invokation.Match.Sdk;
 
+public interface IMatchSdk
+{
+    Task<string> CreateTicketAsync(
+        Ticket ticket,
+        CancellationToken ct = default);
+
+    Task CancelTicketAsync(
+        string queueId,
+        string ticketId,
+        CancellationToken ct = default);
+
+    Task<string> CreateBackfillRequestAsync(
+        BackfillRequest request,
+        CancellationToken ct = default);
+
+    Task CancelBackfillRequestsAsync(
+        string queueId,
+        IEnumerable<string> backfillIds,
+        CancellationToken ct = default);
+
+    Task<IReadOnlyList<string>> ReactivateTicketsAsync(
+        string queueId,
+        IEnumerable<string> ticketIds,
+        CancellationToken ct = default);
+
+    Task<ListPoolTicketsResponse> ListPoolTicketsAsync(
+        ListPoolTicketsRequest request,
+        CancellationToken ct = default);
+
+    Task<ClearQueuePoolResponse> ClearQueuePoolAsync(
+        string queueId,
+        CancellationToken ct = default);
+}
+
 /// <summary>
 /// Async-only client facade over the IVK Match matchmaker gRPC service.
 /// Construct via <see cref="CreateBuilder"/>.
 /// </summary>
-public sealed class MatchSdk : IDisposable, IAsyncDisposable
+public sealed class MatchSdk : IMatchSdk, IDisposable, IAsyncDisposable
 {
     private readonly GrpcChannel _channel;
     private readonly bool _ownsChannel;
