@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/invokation-games/ivk-match-dotnet-sdk/compare/Invokation.Match.Sdk-v1.1.0...Invokation.Match.Sdk-v1.1.1) (2026-04-30)
+
+
+### Bug Fixes
+
+* add IMatchSdk ([#13](https://github.com/invokation-games/ivk-match-dotnet-sdk/issues/13)) ([6d578a8](https://github.com/invokation-games/ivk-match-dotnet-sdk/commit/6d578a8e5e5a672375b4f09fb256c4439e3b19ea))
+
 ## [1.1.0](https://github.com/invokation-games/ivk-match-dotnet-sdk/compare/Invokation.Match.Sdk-v1.0.1...Invokation.Match.Sdk-v1.1.0) (2026-04-29)
 
 
