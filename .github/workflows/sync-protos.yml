@@ -48,6 +48,7 @@ jobs:
           rm -rf protos/matchmaker
           PROTOS_SRC=ivk-protos/proto
           mkdir -p protos/matchmaker/core/v1
+          mkdir -p protos/matchmaker/outcomes/v1
 
           # Required: matchmaker/core & matchmaker/outcomes
           cp $PROTOS_SRC/matchmaker/core/v1/*.proto protos/matchmaker/core/v1/
