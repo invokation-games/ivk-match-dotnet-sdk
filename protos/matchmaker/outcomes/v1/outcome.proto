@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package matchmaker.outcomes.v1;
+
+import "google/protobuf/timestamp.proto";
+import "matchmaker/core/v1/model.proto";
+
+message Outcome {
+  string id = 1;
+  string kind = 2;
+  string queue_id = 3;
+  google.protobuf.Timestamp occurred_at = 4;
+  string producer_id = 5;
+  uint64 producer_sequence = 6;
+
+  oneof payload {
+    MatchCreated match_created = 10;
+    BackfillCreated backfill_created = 11;
+    TicketsExpired tickets_expired = 12;
+    TicketsRemoved tickets_removed = 13;
+    BackfillRequestsExpired backfill_requests_expired = 14;
+    BackfillRequestsRemoved backfill_requests_removed = 15;
+  }
+}
+
+message MatchCreated {
+  matchmaker.core.v1.Match match = 1;
+}
+
+message BackfillCreated {
+  matchmaker.core.v1.Backfill backfill = 1;
+}
+
+message OutcomeBatch {
+  string operation_id = 1;
+  uint32 chunk_index = 2;
+  uint32 chunk_count = 3;
+}
+
+message TicketsExpired {
+  OutcomeBatch batch = 1;
+  repeated string ticket_ids = 2;
+}
+
+message TicketsRemoved {
+  OutcomeBatch batch = 1;
+  repeated string ticket_ids = 2;
+  RemovalReason reason = 3;
+}
+
+message BackfillRequestsExpired {
+  OutcomeBatch batch = 1;
+  repeated string backfill_request_ids = 2;
+}
+
+message BackfillRequestsRemoved {
+  OutcomeBatch batch = 1;
+  repeated string backfill_request_ids = 2;
+  RemovalReason reason = 3;
+}
+
+enum RemovalReason {
+  REMOVAL_REASON_UNSPECIFIED = 0;
+  REMOVAL_REASON_CLEAR_COMMAND = 1;
+  REMOVAL_REASON_QUEUE_CONFIG_CHANGED = 2;
+  REMOVAL_REASON_QUEUE_RETIRED = 3;
+}
