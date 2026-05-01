@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       ivk_protos_sha:
-        description: 'ivk-protos commit SHA to sync from (default: main HEAD)'
+        description: "ivk-protos commit SHA to sync from (default: main HEAD)"
         required: false
-        default: ''
+        default: ""
 
 jobs:
   sync:
@@ -49,18 +49,9 @@ jobs:
           PROTOS_SRC=ivk-protos/proto
           mkdir -p protos/matchmaker/core/v1
 
-          # Required: matchmaker/core/v1
+          # Required: matchmaker/core & matchmaker/outcomes
           cp $PROTOS_SRC/matchmaker/core/v1/*.proto protos/matchmaker/core/v1/
-
-          # Optional: queue/ruleset (may not exist on all revisions of ivk-protos)
-          if [ -d "$PROTOS_SRC/matchmaker/queue/v1" ]; then
-            mkdir -p protos/matchmaker/queue/v1
-            cp $PROTOS_SRC/matchmaker/queue/v1/*.proto protos/matchmaker/queue/v1/
-          fi
-          if [ -d "$PROTOS_SRC/matchmaker/ruleset/v1" ]; then
-            mkdir -p protos/matchmaker/ruleset/v1
-            cp $PROTOS_SRC/matchmaker/ruleset/v1/*.proto protos/matchmaker/ruleset/v1/
-          fi
+          cp $PROTOS_SRC/matchmaker/outcomes/v1/*.proto protos/matchmaker/outcomes/v1/
 
           # Engines: only those listed in manifest.json
           MANIFEST=$PROTOS_SRC/matchmaker/engines/manifest.json
@@ -80,8 +71,8 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: 'feat: sync protos to ${{ steps.sha.outputs.short }}'
-          title: 'feat: sync protos to ivk-protos@${{ steps.sha.outputs.short }}'
+          commit-message: "feat: sync protos to ${{ steps.sha.outputs.short }}"
+          title: "feat: sync protos to ivk-protos@${{ steps.sha.outputs.short }}"
           body: |
             Auto-generated proto sync from ivk-protos.
             Source SHA: ${{ steps.sha.outputs.sha }}
