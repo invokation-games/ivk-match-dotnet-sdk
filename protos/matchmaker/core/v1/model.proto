@@ -61,7 +61,7 @@ message BackfillRequest {
   // Engine-schema payload delivered to the MatchEngine backfill phase.
   optional bytes engine_input = 7;
 
-  // Opaque, caller-owned metadata echoed back on BackfillResult. The matchmaker
+  // Opaque, caller-owned metadata echoed back on Backfill. The matchmaker
   // never inspects this field. Subject to a configurable per-queue size limit.
   optional bytes metadata = 8;
 }
@@ -116,8 +116,8 @@ message Match {
   string ruleset_id = 5;
 }
 
-message BackfillResult {
-  // Backfill result ID.
+message Backfill {
+  // Backfill ID.
   string id = 1;
 
   // The original BackfillRequest, echoed back in full (so callers get their
