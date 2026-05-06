@@ -20,6 +20,8 @@ message Outcome {
     TicketsRemoved tickets_removed = 13;
     BackfillRequestsExpired backfill_requests_expired = 14;
     BackfillRequestsRemoved backfill_requests_removed = 15;
+    TicketOrphaned ticket_orphaned = 16;
+    BackfillRequestOrphaned backfill_request_orphaned = 17;
   }
 }
 
@@ -64,4 +66,32 @@ enum RemovalReason {
   REMOVAL_REASON_CLEAR_COMMAND = 1;
   REMOVAL_REASON_QUEUE_CONFIG_CHANGED = 2;
   REMOVAL_REASON_QUEUE_RETIRED = 3;
+}
+
+// Emitted when a ticket cannot be hydrated into a queue's typed pool because
+// the referenced ruleset is no longer present in the queue's applied spec
+// (e.g. an interleaving apply_spec removed the ruleset between ingress
+// validation and replication consumption).
+message TicketOrphaned {
+  string ticket_id = 1;
+  string ruleset_id = 2;
+  OrphanReason reason = 3;
+  uint64 published_seq = 4;
+  google.protobuf.Timestamp orphaned_at = 5;
+}
+
+// Emitted when a backfill request cannot be hydrated for the same reason.
+message BackfillRequestOrphaned {
+  string backfill_request_id = 1;
+  string ruleset_id = 2;
+  OrphanReason reason = 3;
+  uint64 published_seq = 4;
+  google.protobuf.Timestamp orphaned_at = 5;
+}
+
+enum OrphanReason {
+  ORPHAN_REASON_UNSPECIFIED = 0;
+  // The ruleset that the entity targeted was removed from the queue spec
+  // before hydration could observe the entity.
+  ORPHAN_REASON_RULESET_REMOVED = 1;
 }
