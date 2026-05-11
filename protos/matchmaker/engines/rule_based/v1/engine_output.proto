@@ -1,10 +1,17 @@
 syntax = "proto3";
 package matchmaker.engines.rule_based.v1;
 
-// Engine output for rule-based. Encoded into Match.engine_output and Team.engine_output bytes.
+// Engine output for rule-based. Encoded into Match.engine_output bytes.
 message EngineOutput {
   string region = 1;
   optional MatchObservability observability = 2;
+  // Team composition. Each player_id refers to a Player in some Ticket's engine_input.
+  repeated Team teams = 3;
+}
+
+message Team {
+  string id = 1;
+  repeated string player_ids = 2;
 }
 
 message MatchObservability {

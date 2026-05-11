@@ -1,5 +1,13 @@
 syntax = "proto3";
 package matchmaker.engines.basic_sbmm.v1;
 
-// Engine output for basic-sbmm. Currently empty.
-message EngineOutput {}
+// Engine output for basic-sbmm. Encoded into Match.engine_output bytes.
+message EngineOutput {
+  // Team composition. Each player_id refers to a Player in some Ticket's engine_input.
+  repeated Team teams = 1;
+}
+
+message Team {
+  string id = 1;
+  repeated string player_ids = 2;
+}
