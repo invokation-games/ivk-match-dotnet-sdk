@@ -88,25 +88,16 @@ message CancelTicketRequest {
 }
 message CancelTicketResponse {}
 
-message Team {
-  // Useful for observability or specific team matching
-  string name = 1;
-
-  // Full tickets assigned to this team (each carries its caller-owned metadata).
-  repeated Ticket tickets = 2;
-
-  // Engine-produced output (team-level info, schema defined by engine).
-  optional bytes engine_output = 3;
-}
-
 message Match {
   // Match ID added to telemetry.
   string id = 1;
 
-  // Tickets in this match, organized by team.
-  map<string, Team> teams = 2;
+  // All tickets in this match (each carries its caller-owned metadata). Team
+  // composition is engine-defined and lives in `engine_output`.
+  repeated Ticket tickets = 2;
 
-  // Engine-produced output (match-level info, schema defined by engine).
+  // Engine-produced output (team composition and engine-specific metadata; schema
+  // defined by the engine via `MatchEngine::Output`). Opaque to the framework.
   optional bytes engine_output = 3;
 
   // Timestamp when the match was created.
